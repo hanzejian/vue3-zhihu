@@ -4,6 +4,8 @@
     <h1>{{ count }}</h1>
     <h1>{{ double }}</h1>
     <h1>{{ greetings }}</h1>
+    <h1 v-if="loading">Loading!...</h1>
+    <img v-if="loaded" :src="result.message" alt="">
     <h1>X:{{ x }},Y:{{ y }}</h1>
     <button @click="increase">+1</button>
     <button @click="updateGreeting">Update Title</button>
@@ -13,6 +15,7 @@
 <script lang="ts">
 import { ref, computed, reactive, toRefs, watch, onMounted, onUnmounted } from 'vue';
 import useMousePosition from './hooks/useMousePosition'
+import useURLLoader from './hooks/useURLLoader'
 interface DataProps {
   count: number,
   increase: () => void
@@ -36,6 +39,7 @@ export default {
      * 3.可以脱离组件的逻辑
      */
     const { x, y } = useMousePosition();
+    const { result, loading, loaded } = useURLLoader('https://dog.ceo/api/breeds/image/random')
     const greetings = ref('');
     const updateGreeting = () => {
       greetings.value += 'Hello! '
@@ -53,7 +57,10 @@ export default {
       greetings,
       updateGreeting,
       x,
-      y
+      y,
+      result,
+      loading,
+      loaded
     }
   }
 }
