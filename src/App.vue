@@ -4,6 +4,15 @@
     <h1>{{ count }}</h1>
     <h1>{{ double }}</h1>
     <h1>{{ greetings }}</h1>
+    <Suspense>
+      <!-- Suspence提供两个插槽，default插槽放置回调成功后的展示页面，fallback插槽展示加载时的内容 -->
+      <template #default>
+        <async-show />
+      </template>
+      <template #fallback>
+        <h1>Loading!...</h1>
+      </template>
+    </Suspense>
     <button @click="openModal">openModal</button><br/>
     <modal :isOpen="modalIsOpen" @close-modal="onModalClose">
       My Modal!!!
@@ -21,6 +30,7 @@ import { ref, computed, reactive, toRefs, watch, onMounted, onUnmounted } from '
 import useMousePosition from './hooks/useMousePosition'
 import useURLLoader from './hooks/useURLLoader'
 import Modal from './components/Modal.vue'
+import AsyncShow from './components/AsyncShow.vue';
 interface DataProps {
   count: number,
   increase: () => void
@@ -39,7 +49,8 @@ interface CatResult {
 export default {
   name: 'App',
   components: {
-    Modal
+    Modal,
+    AsyncShow
   },
   // 准备阶段，在所有生命周期函数执行前执行，里面不能引用this
   setup() {
