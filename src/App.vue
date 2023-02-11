@@ -4,10 +4,13 @@
     <h1>{{ count }}</h1>
     <h1>{{ double }}</h1>
     <h1>{{ greetings }}</h1>
+    <p>{{ error }}</p>
     <Suspense>
       <!-- Suspence提供两个插槽，default插槽放置回调成功后的展示页面，fallback插槽展示加载时的内容 -->
       <template #default>
-        <async-show />
+        <!-- 当有两个异步组件时，会等到两个组件的请求都返回后再显示!!!代码提示说只能有一个子节点 -->
+        <!-- <async-show /> -->
+        <dog-show />
       </template>
       <template #fallback>
         <h1>Loading!...</h1>
@@ -18,7 +21,7 @@
       My Modal!!!
     </modal>
     <h1 v-if="loading">Loading!...</h1>
-    <img v-if="loaded" :src="result[0].url" alt="">
+    <!-- <img v-if="loaded" :src="result[0].url" alt=""> -->
     <h1>X:{{ x }},Y:{{ y }}</h1>
     <button @click="increase">+1</button>
     <button @click="updateGreeting">Update Title</button>
@@ -26,11 +29,12 @@
 </template>
 
 <script lang="ts">
-import { ref, computed, reactive, toRefs, watch, onMounted, onUnmounted } from 'vue';
+import { ref, computed, reactive, toRefs, watch, onErrorCaptured } from 'vue';
 import useMousePosition from './hooks/useMousePosition'
 import useURLLoader from './hooks/useURLLoader'
 import Modal from './components/Modal.vue'
 import AsyncShow from './components/AsyncShow.vue';
+import DogShow from './components/DogShow.vue';
 interface DataProps {
   count: number,
   increase: () => void
@@ -50,10 +54,18 @@ export default {
   name: 'App',
   components: {
     Modal,
-    AsyncShow
+    AsyncShow,
+    DogShow
   },
   // 准备阶段，在所有生命周期函数执行前执行，里面不能引用this
   setup() {
+    const error = ref(null)
+    onErrorCaptured((e: any) => {
+      console.log('e', e)
+      error.value = e
+      return true
+    })
+
     // 起到调试作用，用以观测数据的变化
     const data: DataProps = reactive({
       count: 0,
@@ -105,7 +117,8 @@ export default {
       loaded,
       openModal,
       onModalClose,
-      modalIsOpen
+      modalIsOpen,
+      error
     }
   }
 }
