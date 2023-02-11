@@ -4,13 +4,15 @@
     <h1>{{ count }}</h1>
     <h1>{{ double }}</h1>
     <h1>{{ greetings }}</h1>
+    <h1>X:{{ x }},Y:{{ y }}</h1>
     <button @click="increase">+1</button>
     <button @click="updateGreeting">Update Title</button>
   </div>
 </template>
 
 <script lang="ts">
-import { ref, computed, reactive, toRefs, watch } from 'vue';
+import { ref, computed, reactive, toRefs, watch, onMounted, onUnmounted } from 'vue';
+import useMousePosition from './hooks/useMousePosition'
 interface DataProps {
   count: number,
   increase: () => void
@@ -26,10 +28,19 @@ export default {
       increase: () => { data.count++ },
       double: computed(() => data.count * 2)
     })
+
+    /**
+     * 对比起mixin有两大优点
+     * 1.这样做可以清楚这两个值的来源
+     * 2.可以对x,y设置任何的别名，减少命名冲突的风险
+     * 3.可以脱离组件的逻辑
+     */
+    const { x, y } = useMousePosition();
     const greetings = ref('');
     const updateGreeting = () => {
       greetings.value += 'Hello! '
     }
+
     // watch可以同时监听多个值，若一个数据在响应对象里面，则需要用函数的方法监听
     watch([greetings, () => data.count], (newVal, oldVal) => {
       console.log(newVal);
@@ -40,7 +51,9 @@ export default {
     return {
       ...refData,
       greetings,
-      updateGreeting
+      updateGreeting,
+      x,
+      y
     }
   }
 }
